@@ -1,4 +1,4 @@
 WIP  
   
-- [ ] Changeble binds  
+- [x] Changeble binds  
 - [ ] Changeble number of clicks  
