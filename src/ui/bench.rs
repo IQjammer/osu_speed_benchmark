@@ -14,7 +14,7 @@ pub fn render_bench(state: &BenchmarkState, area: Rect, buf: &mut Buffer) {
     let status_line = if state.is_active {
         format!("Clicks: {} / {}", state.current_clicks, state.target_clicks)
     } else if state.current_clicks >= state.target_clicks && state.target_clicks > 0 {
-        format!("Done! Total clicks: {}", state.current_clicks)
+        format!("Done! BPM: {}", state.result)
     } else {
         "Ready. Hit Enter to begin!".to_string()
     };
@@ -34,7 +34,7 @@ pub fn render_bench(state: &BenchmarkState, area: Rect, buf: &mut Buffer) {
 
     let k1_block = Block::default()
         .borders(Borders::ALL)
-        .title(" Key 2 (A) ")
+        .title(" Key 1 (A) ")
         .border_style(if k2_active {
             ratatui::style::Style::default().bold()
         } else {

@@ -6,6 +6,7 @@ pub struct BenchmarkState {
     pub target_clicks: u32,
     pub current_clicks: u32,
     pub timestamps: Vec<Instant>,
+    pub result: u16,
     pub last_key: Option<char>,
 }
 
@@ -16,6 +17,7 @@ impl Default for BenchmarkState {
             target_clicks: 20,
             current_clicks: 0,
             timestamps: Vec::new(),
+            result: 0,
             last_key: None,
         }
     }
@@ -43,13 +45,39 @@ impl BenchmarkState {
         self.last_key = Some(key);
 
         if self.current_clicks >= self.target_clicks {
+            self.result();
             self.is_active = false;
         }
     }
 
-    pub fn result(&mut self) {
-        let mut dt_i = Vec::with_capacity(19);
-        let mut bpm_i = Vec::with_capacity(19);
+    fn result(&mut self) {
+        if self.timestamps.len() < 2 {
+            self.result = 0;
+            return;
+        };
+
+        let mut deltas: Vec<_> = self.timestamps
+            .windows(2)
+            .map(|w| w[1] - w[0])
+            .collect();
+
+        deltas.sort_unstable();
+
+        let len = deltas.len();
+        let mid = len / 2;
+
+        let median_dt_sec =  if len % 2 == 0 {
+            (deltas[mid -1].as_secs_f32() + deltas[mid].as_secs_f32()) / 2.0
+        } else {
+            deltas[mid].as_secs_f32()
+        };
+
+        self.result = if median_dt_sec > 0.0 {
+            (15.0 / median_dt_sec).round() as u16
+        } else {
+                0
+            };
+
     }
 
     pub fn reset(&mut self) {
