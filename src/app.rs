@@ -3,12 +3,13 @@ use std::{io, time::Duration};
 use crossterm::event::{self, Event, KeyCode, KeyEvent, KeyEventKind};
 use ratatui::{DefaultTerminal, Frame};
 
-use crate::{action::Action, bench::BenchmarkState, ui};
+use crate::{action::Action, bench::BenchmarkState, ui, keybinds::Keys};
 
 #[derive(Default)]
 pub struct App {
     pub exit: bool,
     pub bench: BenchmarkState,
+    pub keybinds: Keys,
 }
 
 impl App {
@@ -30,8 +31,10 @@ impl App {
 
     fn handle_events(&mut self) -> io::Result<()> {
         if event::poll(Duration::from_millis(16))? {
-            if let Event::Key(key) = event::read()? {
-                if key.kind == KeyEventKind::Press {
+            if let Event::Key(key) = event::read()? && key.kind == KeyEventKind::Press {
+                if self.keybinds.is_rebinding() {
+                    self.keybinds.handle_key(key.code);
+                } else {
                     let action = self.map_key_to_action(key);
                     self.update(action);
                 }
@@ -47,7 +50,12 @@ impl App {
             KeyCode::Char('q') | KeyCode::Esc => Action::Quit,
             KeyCode::Enter => Action::StartBenchmark,
             KeyCode::Char('r') => Action::Reset,
-            KeyCode::Char(c @ ('a' | 's')) => Action::RegisterClick(c),
+            KeyCode::Char('k') => Action::BindsSelection,
+            KeyCode::Char(c)
+                if c == self.keybinds.key_primary || c == self.keybinds.key_secondary =>
+            {
+                Action::RegisterClick(c)
+            }
             _ => Action::None,
         }
     }
@@ -55,6 +63,7 @@ impl App {
     fn update(&mut self, action: Action) {
         match action {
             Action::Quit => self.exit = true,
+            Action::BindsSelection => self.keybinds.selection(),
             Action::StartBenchmark => self.bench.start(),
             Action::RegisterClick(k) => self.bench.register_click(k),
             Action::Reset => self.bench.reset(),

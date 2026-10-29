@@ -1,4 +1,5 @@
 mod action;
+mod keybinds;
 mod app;
 mod bench;
 mod ui;
