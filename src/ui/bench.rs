@@ -5,9 +5,9 @@ use ratatui::{
     widgets::{Block, Borders, Paragraph, Widget},
 };
 
-use crate::bench::BenchmarkState;
+use crate::{bench::BenchmarkState, keybinds::Keys};
 
-pub fn render_bench(state: &BenchmarkState, area: Rect, buf: &mut Buffer) {
+pub fn render_bench(state: &BenchmarkState, keybinds: &Keys, area: Rect, buf: &mut Buffer) {
     let [top_center, bottom_keys] =
         Layout::vertical([Constraint::Length(5), Constraint::Min(3)]).areas(area);
 
@@ -29,12 +29,15 @@ pub fn render_bench(state: &BenchmarkState, area: Rect, buf: &mut Buffer) {
         Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
             .areas(bottom_keys);
 
-    let k1_active = state.last_key == Some('a');
-    let k2_active = state.last_key == Some('s');
+    let k1_active = state.last_key == Some(keybinds.key_primary);
+    let k2_active = state.last_key == Some(keybinds.key_secondary);
+
+    let k1_title = format!(" Key 1 ({}) ", keybinds.key_primary.to_ascii_uppercase());
+    let k2_title = format!(" Key 2 ({}) ", keybinds.key_secondary.to_ascii_uppercase());
 
     let k1_block = Block::default()
         .borders(Borders::ALL)
-        .title(" Key 1 (A) ")
+        .title(k1_title)
         .border_style(if k2_active {
             ratatui::style::Style::default().bold()
         } else {
@@ -43,7 +46,7 @@ pub fn render_bench(state: &BenchmarkState, area: Rect, buf: &mut Buffer) {
 
     let k2_block = Block::default()
         .borders(Borders::ALL)
-        .title(" Key 2 (S) ")
+        .title(k2_title)
         .border_style(if k2_active {
             ratatui::style::Style::default().bold()
         } else {

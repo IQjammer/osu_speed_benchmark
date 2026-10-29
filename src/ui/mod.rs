@@ -13,5 +13,5 @@ pub fn render(app: &App, area: Rect, buf: &mut Buffer) {
         Layout::vertical([Constraint::Length(3), Constraint::Min(0)]).areas(area);
 
     header::render_header(header_area, buf);
-    bench::render_bench(&app.bench, content_area, buf);
+    bench::render_bench(&app.bench, &app.keybinds, content_area, buf);
 }

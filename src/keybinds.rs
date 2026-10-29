@@ -17,8 +17,8 @@ pub struct Keys {
 impl Default for Keys {
     fn default() -> Self {
         Self {
-            key_primary: 'a',
-            key_secondary: 's',
+            key_primary: 'z',
+            key_secondary: 'x',
             state: BindState::Idle,
         }
     }
