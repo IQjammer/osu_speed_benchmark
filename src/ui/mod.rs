@@ -1,5 +1,6 @@
 mod bench;
 mod header;
+pub mod keybinds;
 
 use ratatui::{
     buffer::Buffer,
@@ -14,4 +15,8 @@ pub fn render(app: &App, area: Rect, buf: &mut Buffer) {
 
     header::render_header(header_area, buf);
     bench::render_bench(&app.bench, &app.keybinds, content_area, buf);
+
+    if app.keybinds.is_rebinding() {
+        keybinds::render_rebind_popup(&app.keybinds, area, buf);
+    }
 }
