@@ -11,7 +11,7 @@ pub fn render_header(area: Rect, buf: &mut Buffer) {
         .border_set(border::THICK)
         .title(" Osu!Speed Benchmark".bold());
 
-    Paragraph::new("Press <Enter> to start | <q> to Quit | <r> to Reset")
+    Paragraph::new("<Enter> to Start | <q> to Quit | <k> to change Keys")
         .centered()
         .block(block)
         .render(area, buf)
