@@ -1,8 +1,8 @@
 use ratatui::{
     buffer::Buffer,
     layout::{Constraint, Layout, Rect},
-    style::Stylize,
-    widgets::{Block, Borders, Paragraph, Widget},
+    style::{Color, Style, Stylize},
+    widgets::{Block, Borders, Gauge, Paragraph, Widget},
 };
 
 use crate::{bench::BenchmarkState, keybinds::Keys};
@@ -11,19 +11,39 @@ pub fn render_bench(state: &BenchmarkState, keybinds: &Keys, area: Rect, buf: &m
     let [top_center, bottom_keys] =
         Layout::vertical([Constraint::Length(5), Constraint::Min(3)]).areas(area);
 
+    let ratio = if state.target_clicks > 0 {
+        (state.current_clicks as f64 / state.target_clicks as f64).clamp(0.0, 1.0)
+    } else {
+        0.0
+    };
+
     let status_line = if state.is_active {
-        format!("Clicks: {} / {}", state.current_clicks, state.target_clicks)
+        format!(
+            "{}/{} clicks ({}%)",
+            state.current_clicks,
+            state.target_clicks,
+            (ratio * 100.0) as u16
+        )
     } else if state.current_clicks >= state.target_clicks && state.target_clicks > 0 {
         format!("Done! BPM: {}", state.result)
     } else {
         "Hit Enter to begin!".to_string()
     };
 
-    Paragraph::new(status_line)
-        .bold()
-        .centered()
+    let gauge = Gauge::default()
         .block(Block::default().borders(Borders::ALL).title(" Progress "))
-        .render(top_center, buf);
+        .gauge_style(
+            Style::default()
+                .fg(if ratio >= 1.0 {
+                    Color::Green
+                } else {
+                    Color::Cyan
+                })
+                .bg(Color::DarkGray),
+        )
+        .ratio(ratio)
+        .label(status_line);
+    gauge.render(top_center, buf);
 
     let [k1_area, k2_area] =
         Layout::horizontal([Constraint::Percentage(50), Constraint::Percentage(50)])
