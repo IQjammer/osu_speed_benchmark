@@ -16,7 +16,7 @@ pub fn render_bench(state: &BenchmarkState, keybinds: &Keys, area: Rect, buf: &m
     } else if state.current_clicks >= state.target_clicks && state.target_clicks > 0 {
         format!("Done! BPM: {}", state.result)
     } else {
-        "Ready. Hit Enter to begin!".to_string()
+        "Hit Enter to begin!".to_string()
     };
 
     Paragraph::new(status_line)
